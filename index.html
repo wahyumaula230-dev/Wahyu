@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kamera HP</title>
+
+<style>
+body {
+    margin: 0;
+    background: #0f172a;
+    color: white;
+    font-family: Arial;
+    text-align: center;
+    padding: 20px;
+}
+
+video {
+    width: 100%;
+    max-width: 600px;
+    border-radius: 20px;
+    background: black;
+    margin-top: 20px;
+}
+
+button {
+    margin: 10px 5px;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#start {
+    background: #22c55e;
+    color: white;
+}
+
+#switch {
+    background: #3b82f6;
+    color: white;
+}
+</style>
+</head>
+
+<body>
+
+<h1>📷 Kamera HP</h1>
+
+<button id="start">Buka Kamera</button>
+<button id="switch">🔄 Ganti Kamera</button>
+
+<br>
+
+<video id="camera" autoplay playsinline></video>
+
+<p id="status">Kamera belum aktif</p>
+
+<script>
+const video = document.getElementById("camera");
+const startBtn = document.getElementById("start");
+const switchBtn = document.getElementById("switch");
+const status = document.getElementById("status");
+
+let stream = null;
+let facingMode = "environment";
+
+async function bukaKamera() {
+    try {
+
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+        }
+
+        stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+                facingMode: facingMode
+            },
+            audio: false
+        });
+
+        video.srcObject = stream;
+
+        status.textContent =
+            "✅ Kamera aktif: " +
+            (facingMode === "environment"
+                ? "Belakang"
+                : "Depan");
+
+    } catch (error) {
+
+        console.error(error);
+
+        status.textContent =
+            "❌ Kamera gagal dibuka: " + error.name;
+
+        alert(
+            "Kamera tidak bisa dibuka.\n\n" +
+            "Pastikan izin kamera sudah diberikan " +
+            "dan halaman dijalankan melalui HTTPS atau localhost."
+        );
+    }
+}
+
+startBtn.addEventListener("click", bukaKamera);
+
+switchBtn.addEventListener("click", () => {
+
+    facingMode =
+        facingMode === "environment"
+        ? "user"
+        : "environment";
+
+    bukaKamera();
+});
+</script>
+
+</body>
+</html>
